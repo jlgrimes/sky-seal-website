@@ -1,0 +1,11 @@
+{
+  "applinks": {
+      "apps": [],
+      "details": [
+      {
+        "appID": "MR26CCZ496.com.melon.skySeal",
+        "paths": ["*"]
+      }
+    ]
+  }
+}
