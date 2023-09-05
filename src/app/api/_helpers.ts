@@ -63,7 +63,9 @@ export const normalizeDeckList = (list: string) => {
   let pokemon = [], trainers = [], energies = [];
   let mode: DeckReadType | null = null;
 
-  for (const line of normalizedList.split('/n')) {
+  for (const line of normalizedList.split(/\r?\n/)) {
+    console.log('line===')
+    console.log(line);
     // Blank line
     if (line.length === 0) continue;
 
@@ -87,5 +89,5 @@ export const normalizeDeckList = (list: string) => {
     ...sortCardList(pokemon),
     ...sortCardList(trainers),
     ...sortCardList(energies)
-  ].join('/n');
+  ].join('\n');
 }
