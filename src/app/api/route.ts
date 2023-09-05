@@ -14,10 +14,10 @@ export async function GET(request: Request) {
     details: 'Ensure you are passing in the param for id.'
   }, { status: 400 });
 
-  if (deckId.length !== 6) return NextResponse.json({
+  if (deckId.length !== 10) return NextResponse.json({
     error: 'incorrect-query-params',
     message: 'Incorrect query parameters.',
-    details: 'Deck id must have a length of 6.'
+    details: 'Deck id must have a length of 10.'
   }, { status: 400 });
 
   const deck = await supabase.from('decks').select('frozen_list').eq('id', deckId);
