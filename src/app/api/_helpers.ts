@@ -64,8 +64,6 @@ export const normalizeDeckList = (list: string) => {
   let mode: DeckReadType | null = null;
 
   for (const line of normalizedList.split(/\r?\n/)) {
-    console.log('line===')
-    console.log(line);
     // Blank line
     if (line.length === 0) continue;
 

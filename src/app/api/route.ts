@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   const body: string = await request.text();
   const existingDeck = await supabase.from('decks').select('id').eq('frozen_list', normalizeDeckList(body));
 
-  if (existingDeck.count && existingDeck.count > 0) {
+  if (existingDeck.data && existingDeck.data.length > 0) {
     return NextResponse.json({
       id: existingDeck.data[0].id
     });
