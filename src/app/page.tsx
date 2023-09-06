@@ -8,6 +8,7 @@ export default function Home() {
             Nothing here... yet
           </h2>
           <p>Stay tuned. Follow @jgrimesey.</p>
+          <a href='https://www.skyseal.app/iiyciubtny'>a deck</a>
       </div>
     </main>
   )
