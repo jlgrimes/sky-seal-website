@@ -102,8 +102,6 @@ export const convertListToCodes = async (list: string) => {
   const cards = [];
   const invalidLines = [];
 
-  console.log(lines)
-
   for (const line of lines) {
     const validCardMatches = getCardMatchesFromLine(line);
     if (validCardMatches) {
@@ -137,3 +135,6 @@ export const convertListToCodes = async (list: string) => {
   }
 }
 
+export const getDeckCount = (cards: { code: string, count: number }[]) => cards.reduce((acc: number, curr: { code: string, count: number }) => {
+  return acc + curr.count;
+}, 0);

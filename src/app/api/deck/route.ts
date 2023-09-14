@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { convertListToCodes, normalizeDeckList } from '../_helpers';
+import { convertListToCodes, getDeckCount, normalizeDeckList } from '../_helpers';
 import { BASE_URL } from '../_const';
 
 export async function GET(request: Request) {
@@ -58,9 +58,7 @@ export async function POST(request: Request) {
     }
   
 
-    const numberOfCards = cards.reduce((acc: number, curr: { code: string, count: number }) => {
-      return acc + curr.count;
-    }, 0);
+    const numberOfCards = getDeckCount(cards);
 
     if (numberOfCards < 60) {
       throw {
