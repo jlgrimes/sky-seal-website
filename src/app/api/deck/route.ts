@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { convertListToCodes, normalizeDeckList } from './_helpers';
+import { convertListToCodes, normalizeDeckList } from '../_helpers';
+import { BASE_URL } from '../_const';
 
 export async function GET(request: Request) {
   const supabase = createRouteHandlerClient({ cookies })
@@ -48,8 +49,10 @@ export async function POST(request: Request) {
     const existingDeck = await supabase.from('frozen decks').select('id').eq('deck_list', JSON.stringify(cards));
 
     if (existingDeck.data && existingDeck.data.length > 0) {
+      const id = existingDeck.data[0].id;
       return NextResponse.json({
-        id: existingDeck.data[0].id
+        id,
+        url: `${BASE_URL}/${id}`
       });
     }
   
@@ -67,9 +70,11 @@ export async function POST(request: Request) {
     }
 
     const createdDeck = await supabase.from('frozen decks').insert({ deck_list: JSON.stringify(cards) }).select('id');
+    const id = createdDeck.data?.[0].id;
 
     return NextResponse.json({
-      id: createdDeck.data?.[0].id,
+      id,
+      url: `${BASE_URL}/${id}`,
       invalidLines
     });
   } catch (e) {
