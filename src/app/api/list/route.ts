@@ -5,11 +5,15 @@ export async function POST(request: Request) {
   const body: string = await request.text();
 
   try {
-    const { cards, invalidLines } = await convertListToCodes(normalizeDeckList(body));
+    const { normalizedList, invalidLines: invalidNormalizedLines }  = normalizeDeckList(body)
+    const { cards, invalidLines } = await convertListToCodes(normalizedList);
 
     return NextResponse.json({
       cards,
-      invalidLines
+      invalidLines: [
+        ...invalidNormalizedLines,
+        ...invalidLines
+      ]
     });
 
   } catch (e) {

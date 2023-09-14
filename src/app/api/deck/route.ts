@@ -45,7 +45,8 @@ export async function POST(request: Request) {
   const body: string = await request.text();
 
   try {
-    const { cards, invalidLines } = await convertListToCodes(normalizeDeckList(body));
+    const { normalizedList, invalidLines: invalidNormalizedLines } = normalizeDeckList(body);
+    const { cards, invalidLines } = await convertListToCodes(normalizedList);
     const existingDeck = await supabase.from('frozen decks').select('id').eq('deck_list', JSON.stringify(cards));
 
     if (existingDeck.data && existingDeck.data.length > 0) {
@@ -65,7 +66,10 @@ export async function POST(request: Request) {
       throw {
         error: 'invalid-deck',
         details: `Deck sent only has ${numberOfCards} cards. Needs to have 60 cards. Please check to make sure all lines are valid.`,
-        invalidLines
+        invalidLines: [
+          ...invalidNormalizedLines,
+          ...invalidLines
+        ]
       }
     }
 
@@ -75,7 +79,10 @@ export async function POST(request: Request) {
     return NextResponse.json({
       id,
       url: `${BASE_URL}/${id}`,
-      invalidLines
+      invalidLines: [
+        ...invalidNormalizedLines,
+        ...invalidLines
+      ]
     });
   } catch (e) {
     return NextResponse.json(e, { status: 400 });

@@ -54,14 +54,23 @@ export const normalizeDeckList = (list: string) => {
   
   normalizedList = normalizedList.trim();
 
-  let deck = [];
+  let deck = [], invalidLines = [];
 
   for (const line of normalizedList.split(/\r?\n/)) {
-    if (line.length === 0 || !getCardMatchesFromLine(line)) continue;
+    if (line.length === 0) continue;
+
+    if (!getCardMatchesFromLine(line)) {
+      invalidLines.push(line);
+      continue;
+    }
+
     deck.push(line);
   }
 
-  return sortCardList(deck).join('\n');
+  return {
+    normalizedList: sortCardList(deck).join('\n'),
+    invalidLines
+  };
 }
 
 const PTCGO_CODE_MAP_SV = {
