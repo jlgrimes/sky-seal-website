@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     details: 'Deck id must have a length of 10.'
   }, { status: 400 });
 
-  const deck = await supabase.from('decks').select('frozen_list').eq('id', deckId);
+  const deck = await supabase.from('frozen decks').select('deck_list').eq('id', deckId);
 
   if (deck.error) return NextResponse.json({
     error: 'database-error',
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
   }, { status: 400 });
 
   return NextResponse.json({
-    list: deck.data[0].frozen_list
+    list: deck.data[0].deck_list
   });
 }
  
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   const supabase = createRouteHandlerClient({ cookies })
   
   const body: string = await request.text();
-  const existingDeck = await supabase.from('decks').select('id').eq('frozen_list', normalizeDeckList(body));
+  const existingDeck = await supabase.from('frozen decks').select('id').eq('deck_list', normalizeDeckList(body));
 
   if (existingDeck.data && existingDeck.data.length > 0) {
     return NextResponse.json({
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     });
   }
 
-  const createdDeck = await supabase.from('decks').insert({ frozen_list: normalizeDeckList(body) }).select('id');
+  const createdDeck = await supabase.from('frozen decks').insert({ deck_list: normalizeDeckList(body) }).select('id');
  
   return NextResponse.json({
     id: createdDeck.data?.[0].id
