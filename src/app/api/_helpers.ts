@@ -89,3 +89,63 @@ export const normalizeDeckList = (list: string) => {
     ...sortCardList(energies)
   ].join('\n');
 }
+
+const PTCGO_CODE_MAP_SV = {
+  sv1: 'SVI',
+  sv2: 'PAL',
+  sv3: 'OBF',
+  sve: 'SVE'
+};
+
+const validCardRegexGroups = /^(\d+(?:\+\d)*) ([a-zA-Z{}\-\' ]*) ([a-zA-Z]{3}) (\d+(?:\+\d)*)$/;
+const validPromoRegex = /^\d+(\+\d)* [a-zA-Z ]* PR-[a-zA-Z]{2} \d+(\+\d)*$/gi;
+const validNormalEnergyRegex = /^\d+(\+\d)* [a-zA-Z ]* (Energy)$/gi;
+
+export const convertListToCodes = async (list: string) => {
+  const sets = await fetch('https://api.pokemontcg.io/v2/sets').then((res) => res.json());
+  const setData: Record<string, any>[] | null = sets['data'];
+
+  if (!setData) {
+    throw {
+      error: 'fetching-set-data',
+      message: 'Error fetching set data',
+      details: 'Something went wrong fetching the set data from api.pokemontcg.io. Its their fault, probably.'
+    }
+  }
+
+  const lines = list.split('\n');
+  const cards = [];
+  const invalidLines = [];
+
+  for (const line of lines) {
+    const validCardMatches = validCardRegexGroups.exec(line);
+    if (validCardMatches) {
+      const [_, count, name, ptcgoCode, setNum] = validCardMatches;
+
+      let setId = undefined;
+      setId = setData.find((set) => set['ptcgoCode'] && set['ptcgoCode'].toLowerCase() === ptcgoCode.toLowerCase())?.['id'];
+
+      if (!setId) setId = Object.entries(PTCGO_CODE_MAP_SV).find(([_, svPtcgoCode]) => svPtcgoCode.toLowerCase() === ptcgoCode.toLowerCase())?.[1];
+
+      if (!setId) throw {
+        error: 'unknown-set',
+        message: `Unknown set for card ${name}`,
+        details: `${ptcgoCode} is not a valid set for entered line "${line}".`
+      }
+
+      cards.push({
+        count: parseInt(count),
+        code: `${setId.toLowerCase()}-${setNum}`,
+      });
+      continue;
+    } else {
+      invalidLines.push(line)
+    }
+  }
+
+  return {
+    cards,
+    invalidLines
+  }
+}
+

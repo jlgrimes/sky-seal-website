@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { normalizeDeckList } from './_helpers';
+import { convertListToCodes, normalizeDeckList } from './_helpers';
 
 export async function GET(request: Request) {
   const supabase = createRouteHandlerClient({ cookies })
@@ -41,19 +41,38 @@ export async function GET(request: Request) {
  
 export async function POST(request: Request) {
   const supabase = createRouteHandlerClient({ cookies })
-  
   const body: string = await request.text();
-  const existingDeck = await supabase.from('frozen decks').select('id').eq('deck_list', normalizeDeckList(body));
 
-  if (existingDeck.data && existingDeck.data.length > 0) {
+  try {
+    const { cards, invalidLines } = await convertListToCodes(normalizeDeckList(body));
+    const existingDeck = await supabase.from('frozen decks').select('id').eq('deck_list', JSON.stringify(cards));
+
+    if (existingDeck.data && existingDeck.data.length > 0) {
+      return NextResponse.json({
+        id: existingDeck.data[0].id
+      });
+    }
+  
+
+    const numberOfCards = cards.reduce((acc: number, curr: { code: string, count: number }) => {
+      return acc + curr.count;
+    }, 0);
+
+    if (numberOfCards < 60) {
+      throw {
+        error: 'invalid-deck',
+        details: `Deck sent only has ${numberOfCards} cards. Needs to have 60 cards. Please check to make sure all lines are valid.`,
+        invalidLines
+      }
+    }
+
+    const createdDeck = await supabase.from('frozen decks').insert({ deck_list: JSON.stringify(cards) }).select('id');
+
     return NextResponse.json({
-      id: existingDeck.data[0].id
+      id: createdDeck.data?.[0].id,
+      invalidLines
     });
+  } catch (e) {
+    return NextResponse.json(e, { status: 400 });
   }
-
-  const createdDeck = await supabase.from('frozen decks').insert({ deck_list: normalizeDeckList(body) }).select('id');
- 
-  return NextResponse.json({
-    id: createdDeck.data?.[0].id
-  })
 }
