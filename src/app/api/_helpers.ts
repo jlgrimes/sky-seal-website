@@ -125,7 +125,7 @@ export const convertListToCodes = async (list: string) => {
       let setId = undefined;
       setId = setData.find((set) => set['ptcgoCode'] && set['ptcgoCode'].toLowerCase() === ptcgoCode.toLowerCase())?.['id'];
 
-      if (!setId) setId = Object.entries(PTCGO_CODE_MAP_SV).find(([_, svPtcgoCode]) => svPtcgoCode.toLowerCase() === ptcgoCode.toLowerCase())?.[1];
+      if (!setId) setId = Object.entries(PTCGO_CODE_MAP_SV).find(([_, svPtcgoCode]) => svPtcgoCode.toLowerCase() === ptcgoCode.toLowerCase())?.[0];
 
       if (!setId) throw {
         error: 'unknown-set',
