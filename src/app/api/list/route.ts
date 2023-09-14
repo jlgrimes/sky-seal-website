@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       count: getDeckCount(cards),
       cards,
-      invalidLines: [
+      'not-parsed': [
         ...invalidNormalizedLines,
         ...invalidLines
       ]

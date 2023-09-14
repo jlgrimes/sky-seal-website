@@ -64,7 +64,7 @@ export async function POST(request: Request) {
       throw {
         error: 'invalid-deck',
         details: `Deck sent only has ${numberOfCards} cards. Needs to have 60 cards. Please check to make sure all lines are valid.`,
-        invalidLines: [
+        'not-parsed': [
           ...invalidNormalizedLines,
           ...invalidLines
         ]
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       id,
       url: `${BASE_URL}/${id}`,
-      invalidLines: [
+      'not-parsed': [
         ...invalidNormalizedLines,
         ...invalidLines
       ]
