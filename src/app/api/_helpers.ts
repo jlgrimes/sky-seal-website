@@ -33,12 +33,6 @@ Energy: 1
 Total Cards: 60
 `;
 
-enum DeckReadType {
-  Pokemon,
-  Trainer,
-  Energy
-}
-
 const getCardCount = (line: String) => parseInt(line.substring(0, line.indexOf(' ')));
 const getCardNameAndInfo = (line: String) => line.substring(line.indexOf(' '));
 
@@ -60,34 +54,14 @@ export const normalizeDeckList = (list: string) => {
   
   normalizedList = normalizedList.trim();
 
-  let pokemon = [], trainers = [], energies = [];
-  let mode: DeckReadType | null = null;
+  let deck = [];
 
   for (const line of normalizedList.split(/\r?\n/)) {
-    // Blank line
-    if (line.length === 0) continue;
-
-    const firstPhrase: string = line.substring(0, line.indexOf(' '));
-    if (firstPhrase === 'Pokémon:') {
-      mode = DeckReadType.Pokemon;
-    } else if (firstPhrase === 'Trainer:') {
-      mode = DeckReadType.Trainer;
-    } else if (firstPhrase === 'Energy:') {
-      mode = DeckReadType.Energy;
-    } else if (firstPhrase === 'Total') {
-      continue;
-    } else {
-      if (mode === DeckReadType.Pokemon) pokemon.push(line);
-      else if (mode === DeckReadType.Trainer) trainers.push(line);
-      else if (mode === DeckReadType.Energy) energies.push(line);
-    }
+    if (line.length === 0 || !getCardMatchesFromLine(line)) continue;
+    deck.push(line);
   }
 
-  return [
-    ...sortCardList(pokemon),
-    ...sortCardList(trainers),
-    ...sortCardList(energies)
-  ].join('\n');
+  return sortCardList(deck).join('\n');
 }
 
 const PTCGO_CODE_MAP_SV = {
@@ -96,6 +70,8 @@ const PTCGO_CODE_MAP_SV = {
   sv3: 'OBF',
   sve: 'SVE'
 };
+
+export const getCardMatchesFromLine = (line: string) => validCardRegexGroups.exec(line);
 
 const validCardRegexGroups = /^(\d+(?:\+\d)*) ([a-zA-Z{}\-\' ]*) ([a-zA-Z]{3}) (\d+(?:\+\d)*)$/;
 const validPromoRegex = /^\d+(\+\d)* [a-zA-Z ]* PR-[a-zA-Z]{2} \d+(\+\d)*$/gi;
@@ -117,8 +93,10 @@ export const convertListToCodes = async (list: string) => {
   const cards = [];
   const invalidLines = [];
 
+  console.log(lines)
+
   for (const line of lines) {
-    const validCardMatches = validCardRegexGroups.exec(line);
+    const validCardMatches = getCardMatchesFromLine(line);
     if (validCardMatches) {
       const [_, count, name, ptcgoCode, setNum] = validCardMatches;
 
@@ -142,6 +120,7 @@ export const convertListToCodes = async (list: string) => {
       invalidLines.push(line)
     }
   }
+  console.log(cards, invalidLines)
 
   return {
     cards,
