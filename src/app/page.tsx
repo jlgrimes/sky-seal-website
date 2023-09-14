@@ -7,8 +7,8 @@ export default function Home() {
         <h2>
             Nothing here... yet
           </h2>
+          <p>Get it? Concealed cards. Like the ability? Haha</p>
           <p>Stay tuned. Follow @jgrimesey.</p>
-          <a href='https://www.skyseal.app/iiyciubtny'>a deck</a>
       </div>
     </main>
   )
