@@ -49,6 +49,16 @@ const sortCardList = (cardList: String[]) => {
   });
 }
 
+/**
+ * Checks if a line is a valid card.
+ * 
+ * @param line Line of ptcg Live/limitless/etc list. Ex: 1 Cramorant LOR 50
+ * @returns true/false
+ */
+export const ifValidCard = (line: string) => {
+  return validCardRegexGroups.exec(line) || validLimitlessEnergy.exec(line);
+}
+
 export const normalizeDeckList = (list: string) => {
   let normalizedList = list;
   
@@ -59,7 +69,7 @@ export const normalizeDeckList = (list: string) => {
   for (const line of normalizedList.split(/\r?\n/)) {
     if (line.length === 0) continue;
 
-    if (!getCardMatchesFromLine(line)) {
+    if (!ifValidCard(line)) {
       invalidLines.push(line);
       continue;
     }
@@ -80,9 +90,8 @@ const PTCGO_CODE_MAP_SV = {
   sve: 'SVE'
 };
 
-export const getCardMatchesFromLine = (line: string) => validCardRegexGroups.exec(line);
-
-const validCardRegexGroups = /^(\d+(?:\+\d)*) ([a-zA-Z{}\-\' ]*) ([a-zA-Z]{3}) (\d+(?:\+\d)*)$/;
+const validCardRegexGroups = /^(\d+(?:\+\d)*) ([a-zA-Z{}\-\é' ]*) ([a-zA-Z]{3}|[a-zA-Z]{2}-[a-zA-Z]{2}) (\d+(?:\+\d)*)$/;
+const validLimitlessEnergy = /^(\d+(?:\+\d)*) [a-zA-Z{}\-\é' ]* Energy (\d+(?:\+\d)*)$/;
 const validPromoRegex = /^\d+(\+\d)* [a-zA-Z ]* PR-[a-zA-Z]{2} \d+(\+\d)*$/gi;
 const validNormalEnergyRegex = /^\d+(\+\d)* [a-zA-Z ]* (Energy)$/gi;
 
@@ -103,7 +112,7 @@ export const convertListToCodes = async (list: string) => {
   const invalidLines = [];
 
   for (const line of lines) {
-    const validCardMatches = getCardMatchesFromLine(line);
+    const validCardMatches = validCardRegexGroups.exec(line);
     if (validCardMatches) {
       const [_, count, name, ptcgoCode, setNum] = validCardMatches;
 
@@ -123,9 +132,20 @@ export const convertListToCodes = async (list: string) => {
         code: `${setId.toLowerCase()}-${setNum}`,
       });
       continue;
-    } else {
-      invalidLines.push(line)
     }
+
+    const limitlessEnergyMatch = validLimitlessEnergy.exec(line);
+    if (limitlessEnergyMatch) {
+      const [_, count, setNum] = limitlessEnergyMatch;
+
+      cards.push({
+        count: parseInt(count),
+        code: `sve-${setNum}`,
+      });
+      continue;
+    }
+
+    invalidLines.push(line)
   }
   console.log(cards, invalidLines)
 
