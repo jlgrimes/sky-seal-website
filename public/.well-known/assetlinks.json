@@ -2,7 +2,7 @@
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target": {
     "namespace": "android_app",
-    "package_name": "com.melon.sky_seal",
+    "package_name": "com.melon.concealed",
     "sha256_cert_fingerprints":
     ["05:AE:B7:4E:CC:E0:15:72:0B:48:71:A7:98:50:E7:F0:4D:8C:E3:F3:6B:C6:C1:5D:10:EF:85:8E:6F:1D:78:D7"]
   }
