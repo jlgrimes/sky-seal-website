@@ -35,7 +35,7 @@ body {
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: var(--theme-primary);
+  background: var(--theme-dark);
 }
 
 a {

@@ -1,6 +1,11 @@
+import { DeckViewer } from './_components/DeckViewer/DeckViewer'
 import styles from './page.module.css'
 
-export default function Home() {
+export default function Home({ params }: { params: { slug: string | undefined } }) {
+  if (params.slug && params.slug.length > 0) {
+    return <DeckViewer deckId={params.slug.trim()} />
+  }
+
   return (
     <main className={styles.main}>
       <div className={styles.title}>
