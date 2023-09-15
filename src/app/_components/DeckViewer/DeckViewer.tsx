@@ -1,5 +1,7 @@
+import styles from './DeckViewer.module.css';
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
+import Image from "next/image";
 
 interface DeckViewerProps {
   deckId: string;
@@ -10,6 +12,11 @@ function getTargetTable(deckId: string) {
   if (deckId.length === 11) return 'frozen decks';
 
   return null;
+}
+
+function buildImageUrl(deckId: string) {
+  const [setCode, setNum] = deckId.split('-');
+  return `https://images.pokemontcg.io/${setCode}/${setNum}_hires.png`;
 }
 
 export async function DeckViewer(props: DeckViewerProps) {
@@ -39,7 +46,20 @@ export async function DeckViewer(props: DeckViewerProps) {
     cards = cardsRes.data ?? [];
   }
 
-  return <div>
-    {JSON.stringify(cards)}
-  </div>
+  return (
+    <div>
+      <div className={styles['card-layout']}>
+        {cards.map((card) => (
+          <div key={card.code} className={styles['card-view-container']}>
+            <Image
+              src={buildImageUrl(card.code)}
+              alt={card.code}
+              fill={true}
+              objectFit='contain'
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }

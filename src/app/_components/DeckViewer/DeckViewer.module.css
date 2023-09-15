@@ -1,0 +1,10 @@
+.card-layout {
+  display: grid;
+  grid-template-columns: repeat( auto-fit, minmax(250px, 1fr) );
+}
+
+.card-view-container {
+  position: relative;
+  min-width: 100px;
+  min-height: 200px;
+}
