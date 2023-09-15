@@ -16,6 +16,11 @@ function getTargetTable(deckId: string) {
 
 function buildImageUrl(deckId: string) {
   const [setCode, setNum] = deckId.split('-');
+
+  if (setCode.toLowerCase() === 'swshp') {
+    return `https://images.pokemontcg.io/${setCode}/SWSH${setNum}_hires.png`;
+  }
+
   return `https://images.pokemontcg.io/${setCode}/${setNum}_hires.png`;
 }
 
