@@ -44,6 +44,11 @@
   .header {
     text-align: center;
   }
+
+  .container {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
 }
 
 /* Tablet and Smaller Desktop */
