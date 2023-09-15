@@ -52,17 +52,23 @@ export async function DeckViewer(props: DeckViewerProps) {
   }
 
   return (
-    <div className={styles['card-layout']}>
-      {cards.map((card) => (
-        <div key={card.code} className={styles['card-view-container']}>
-          <Image
-            src={buildImageUrl(card.code)}
-            alt={card.code}
-            fill={true}
-            objectFit='contain'
-          />
-        </div>
-      ))}
-    </div>
+    <main className={styles.container}>
+      <section className={styles.header}>
+        {/* <h2>My deck</h2> */}
+        <h2 className={styles.link}>concealed.cards/{props.deckId}</h2>
+      </section>
+      <div className={styles['card-layout']}>
+        {cards.map((card) => (
+          <div key={card.code} className={styles['card-view-container']}>
+            <Image
+              src={buildImageUrl(card.code)}
+              alt={card.code}
+              fill={true}
+              objectFit='contain'
+            />
+          </div>
+        ))}
+      </div>
+    </main>
   )
 }
