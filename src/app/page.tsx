@@ -16,7 +16,7 @@ export default function Home() {
       </div>
       <div className={styles.card}>
           <h2>
-            PTCG Live's best friend.
+            PTCG Live&apos;s best friend.
           </h2>
           <p>Concealed lets you continue the excitement of the Pokémon TCG into the battle ring with Pokémon TCG Live. Export any deck made on Concealed to a Pokémon TCG Live compatible list with just a tap.</p>
       </div>
@@ -30,7 +30,7 @@ export default function Home() {
         <h2>
             Developer friendly.
           </h2>
-          <p>Give your users the best deck viewing experience with Concealed through our public API. Send us a deck list, we'll send you a deep link to view it in Concealed. It's that easy.</p>
+          <p>Give your users the best deck viewing experience with Concealed through our public API. Send us a deck list, we&apos;ll send you a deep link to view it in Concealed. It&apos;s that easy.</p>
       </div>
       </div>
       <div className={styles.comingSoon}>
