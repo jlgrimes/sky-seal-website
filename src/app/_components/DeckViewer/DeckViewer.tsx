@@ -21,7 +21,7 @@ export async function DeckViewer(props: DeckViewerProps) {
     return null;
   }
 
-  const foundDeckRes = await supabase.from(targetTable).select('*');
+  const foundDeckRes = await supabase.from(targetTable).select('*').eq('id', props.deckId);
 
   if (!foundDeckRes.data || foundDeckRes.data.length === 0) {
     // TODO: Oopsies! No deck with that ID!
@@ -35,7 +35,7 @@ export async function DeckViewer(props: DeckViewerProps) {
     cards = JSON.parse(deck['deck_list']);
   } else {
     // Else, it's a user saved deck list and we need to fetch it
-    const cardsRes = await supabase.from('cards').select('code,count').eq('id', deck['id']).returns<{ code: string, count: number }[]>();
+    const cardsRes = await supabase.from('cards').select('code,count').eq('deck_id', deck['id']);
     cards = cardsRes.data ?? [];
   }
 
