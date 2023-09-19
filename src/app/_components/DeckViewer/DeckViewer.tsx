@@ -27,10 +27,6 @@ function buildImageUrl(deckId: string) {
   return `https://images.pokemontcg.io/${setCode}/${setNum}_hires.png`;
 }
 
-function sortCards (cardA: CardType, cardB: CardType) {
-
-}
-
 export async function DeckViewer(props: DeckViewerProps) {
   const supabase = createServerComponentClient({ cookies });
   const targetTable = getTargetTable(props.deckId)

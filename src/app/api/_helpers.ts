@@ -129,6 +129,43 @@ const fetchCardData = async (cards: StoredCardType[]) => {
   })
 }
 
+function sortCards (cardA: CardType, cardB: CardType) {
+  const supertypeScores: Record<string, number> = {
+    'Pokémon': 1,
+    'Trainer': 2,
+    'Energy': 3
+  };
+
+  if (supertypeScores[cardA.supertype] < supertypeScores[cardB.supertype]) return -1;
+  if (supertypeScores[cardA.supertype] > supertypeScores[cardB.supertype]) return 1;
+  
+  const cardASubtypes = JSON.parse(cardA.subtype);
+  const cardBSubtypes = JSON.parse(cardB.subtype);
+
+  if (cardA.supertype === 'Trainer' && cardB.supertype === 'Trainer') {
+    const trainerSubtypeScores: Record<string, number> = {
+      'Supporter': 1,
+      'Item': 2,
+      'Tool': 3,
+      'Stadium': 4,
+    };
+  
+    if (trainerSubtypeScores[cardASubtypes[0]] < trainerSubtypeScores[cardBSubtypes[0]]) return -1;
+    if (trainerSubtypeScores[cardASubtypes[0]] > trainerSubtypeScores[cardBSubtypes[0]]) return 1;
+  }
+
+  if (cardA.count > cardB.count) return -1;
+  if (cardA.count < cardB.count) return 1;
+
+  return 0;
+}
+
+export interface StoredDeckType {
+  pokemon: StoredCardType[],
+  trainer: StoredCardType[],
+  energy: StoredCardType[],
+}
+
 export const convertListToCards = async (list: string) => {
   const sets = await fetch('https://api.pokemontcg.io/v2/sets').then((res) => res.json());
   const setData: Record<string, any>[] | null = sets['data'];
@@ -189,13 +226,48 @@ export const convertListToCards = async (list: string) => {
   }
 
   const loadedCardData = await fetchCardData(cards);
+  const sortedCardData = loadedCardData.sort(sortCards);
+
+  const minifiedCardData = sortedCardData.reduce((acc: StoredDeckType, curr) => {
+    const minifiedCard: StoredCardType = {
+      code: curr.code,
+      count: curr.count
+    };
+
+    if (curr.supertype === 'Pokémon') {
+      return {
+        ...acc,
+        pokemon: [...acc.pokemon, minifiedCard]
+      }
+    }
+
+    if (curr.supertype === 'Trainer') {
+      return {
+        ...acc,
+        trainer: [...acc.trainer, minifiedCard]
+      }
+    }
+
+    if (curr.supertype === 'Energy') {
+      return {
+        ...acc,
+        energy: [...acc.energy, minifiedCard]
+      }
+    }
+
+    return acc;
+  }, {
+    pokemon: [],
+    trainer: [],
+    energy: []
+  });
 
   return {
-    cards: loadedCardData,
+    cards: minifiedCardData,
     invalidLines
   }
 }
 
-export const getDeckCount = (cards: { code: string, count: number }[]) => cards.reduce((acc: number, curr: { code: string, count: number }) => {
+export const getDeckCount = (cards: StoredDeckType) => [...cards.pokemon, ...cards.trainer, ...cards.energy].reduce((acc: number, curr: { code: string, count: number }) => {
   return acc + curr.count;
 }, 0);
