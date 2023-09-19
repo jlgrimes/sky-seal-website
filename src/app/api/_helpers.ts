@@ -90,7 +90,7 @@ const PTCGO_CODE_MAP_SV = {
   sve: 'SVE'
 };
 
-const validCardRegexGroups = /^(\d+(?:\+\d)*) ([a-zA-Z{}\-\é' ]*) ([a-zA-Z]{3}|[a-zA-Z]{2}-[a-zA-Z]{2}) (\d+(?:\+\d)*)$/;
+const validCardRegexGroups = /^(\d+(?:\+\d)*) ([a-zA-Z{}\-\é' ]*) ([a-zA-Z]{3}|[a-zA-Z]{3}-[a-zA-Z]{2}) (\d+(?:\+\d)*)$/;
 const validLimitlessEnergy = /^(\d+(?:\+\d)*) [a-zA-Z{}\-\é' ]* Energy (\d+(?:\+\d)*)$/;
 const validPromoRegex = /^\d+(\+\d)* [a-zA-Z ]* PR-[a-zA-Z]{2} \d+(\+\d)*$/gi;
 const validNormalEnergyRegex = /^\d+(\+\d)* [a-zA-Z ]* (Energy)$/gi;
@@ -117,9 +117,16 @@ export const convertListToCodes = async (list: string) => {
       const [_, count, name, ptcgoCode, setNum] = validCardMatches;
 
       let setId = undefined;
-      setId = setData.find((set) => set['ptcgoCode'] && set['ptcgoCode'].toLowerCase() === ptcgoCode.toLowerCase())?.['id'];
+      setId = setData.find((set) => set['ptcgoCode'] && !set['name'].toLowerCase().includes('gallery') && set['ptcgoCode'].toLowerCase() === ptcgoCode.toLowerCase())?.['id'];
 
       if (!setId) setId = Object.entries(PTCGO_CODE_MAP_SV).find(([_, svPtcgoCode]) => svPtcgoCode.toLowerCase() === ptcgoCode.toLowerCase())?.[0];
+      if (!setId) {
+        // If it's a gallery subset card
+        console.log(ptcgoCode)
+        if (/^.*-[a-zA-Z][gG]$/.exec(ptcgoCode)) {
+          setId = setData.find((set) => set['ptcgoCode'] && set['name'].toLowerCase().includes('gallery') && set['ptcgoCode'].toLowerCase() === ptcgoCode.split('-')[0].toLowerCase())?.['id'];
+        }
+      }
 
       if (!setId) throw {
         error: 'unknown-set',
