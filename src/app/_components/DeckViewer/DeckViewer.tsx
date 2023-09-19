@@ -8,7 +8,7 @@ interface DeckViewerProps {
 }
 
 export interface StoredCardType { code: string, count: number };
-export interface CardType { code: string, count: number, supertype: string, subtype: string };
+export interface CardType { code: string, count: number, supertype: string, subtype: string, rarity: string };
 
 function getTargetTable(deckId: string) {
   if (deckId.length === 10) return 'decks';
@@ -50,7 +50,7 @@ export async function DeckViewer(props: DeckViewerProps) {
     cards = JSON.parse(deck['deck_list']);
   } else {
     // Else, it's a user saved deck list and we need to fetch it
-    const cardsRes = await supabase.from('cards').select('code,count,supertype,subtype').eq('deck_id', deck['id']);
+    const cardsRes = await supabase.from('cards').select('code,count,supertype,subtype,rarity').eq('deck_id', deck['id']);
     cards = cardsRes.data ?? [];
   }
 
