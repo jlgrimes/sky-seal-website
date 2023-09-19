@@ -117,12 +117,11 @@ export const convertListToCodes = async (list: string) => {
       const [_, count, name, ptcgoCode, setNum] = validCardMatches;
 
       let setId = undefined;
-      setId = setData.find((set) => set['ptcgoCode'] && !set['name'].toLowerCase().includes('gallery') && set['ptcgoCode'].toLowerCase() === ptcgoCode.toLowerCase())?.['id'];
+      setId = setData.find((set) => set['ptcgoCode'] && set['id'] !== 'cel25c' && !set['name'].toLowerCase().includes('gallery') && set['ptcgoCode'].toLowerCase() === ptcgoCode.toLowerCase())?.['id'];
 
       if (!setId) setId = Object.entries(PTCGO_CODE_MAP_SV).find(([_, svPtcgoCode]) => svPtcgoCode.toLowerCase() === ptcgoCode.toLowerCase())?.[0];
       if (!setId) {
         // If it's a gallery subset card
-        console.log(ptcgoCode)
         if (/^.*-[a-zA-Z][gG]$/.exec(ptcgoCode)) {
           setId = setData.find((set) => set['ptcgoCode'] && set['name'].toLowerCase().includes('gallery') && set['ptcgoCode'].toLowerCase() === ptcgoCode.split('-')[0].toLowerCase())?.['id'];
         }
