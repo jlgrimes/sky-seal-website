@@ -226,48 +226,13 @@ export const convertListToCards = async (list: string) => {
   }
 
   const loadedCardData = await fetchCardData(cards);
-  const sortedCardData = loadedCardData.sort(sortCards);
-
-  const minifiedCardData = sortedCardData.reduce((acc: StoredDeckType, curr) => {
-    const minifiedCard: StoredCardType = {
-      code: curr.code,
-      count: curr.count
-    };
-
-    if (curr.supertype === 'Pokémon') {
-      return {
-        ...acc,
-        pokemon: [...acc.pokemon, minifiedCard]
-      }
-    }
-
-    if (curr.supertype === 'Trainer') {
-      return {
-        ...acc,
-        trainer: [...acc.trainer, minifiedCard]
-      }
-    }
-
-    if (curr.supertype === 'Energy') {
-      return {
-        ...acc,
-        energy: [...acc.energy, minifiedCard]
-      }
-    }
-
-    return acc;
-  }, {
-    pokemon: [],
-    trainer: [],
-    energy: []
-  });
 
   return {
-    cards: minifiedCardData,
+    cards: loadedCardData,
     invalidLines
   }
 }
 
-export const getDeckCount = (cards: StoredDeckType) => [...cards.pokemon, ...cards.trainer, ...cards.energy].reduce((acc: number, curr: { code: string, count: number }) => {
+export const getDeckCount = (cards: CardType[]) => cards.reduce((acc: number, curr: { code: string, count: number }) => {
   return acc + curr.count;
 }, 0);
