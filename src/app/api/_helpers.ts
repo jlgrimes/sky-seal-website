@@ -130,7 +130,7 @@ const fetchCardData = async (cards: StoredCardType[]) => {
   })
 }
 
-function sortCards (cardA: CardType, cardB: CardType) {
+export function sortCards (cardA: CardType, cardB: CardType) {
   const supertypeScores: Record<string, number> = {
     'Pokémon': 1,
     'Trainer': 2,

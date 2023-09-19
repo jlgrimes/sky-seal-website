@@ -12,6 +12,30 @@
   min-height: calc(180px * 1.414);
 }
 
+.card-count {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  font-size: 3rem;
+  text-align: center;
+  transform: translate(-50%, 0%);
+  z-index: 3;
+}
+
+.card-view-container:before {
+  content: '';
+  width: 60px;
+  height: 60px;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  background-color: #060606;
+  opacity: 0.8;
+  z-index: 2;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, -6px);
+}
 
 .container {
   display: flex;

@@ -1,3 +1,4 @@
+import { sortCards } from '@/app/api/_helpers';
 import styles from './DeckViewer.module.css';
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
@@ -58,10 +59,11 @@ export async function DeckViewer(props: DeckViewerProps) {
     <main className={styles.container}>
       <section className={styles.header}>
         {/* <h2>My deck</h2> */}
+        {deck['name'] && <h2>{deck['name']}</h2>}
         <h2 className={styles.link}>concealed.cards/{props.deckId}</h2>
       </section>
       <div className={styles['card-layout']}>
-        {cards.map((card) => (
+        {cards.sort(sortCards).map((card) => (
           <div key={card.code} className={styles['card-view-container']}>
             <Image
               src={buildImageUrl(card.code)}
@@ -69,6 +71,7 @@ export async function DeckViewer(props: DeckViewerProps) {
               fill={true}
               objectFit='contain'
             />
+            <h2 className={styles['card-count']}>{card.count}</h2>
           </div>
         ))}
       </div>
