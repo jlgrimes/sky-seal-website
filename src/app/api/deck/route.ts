@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { convertListToCodes, getDeckCount, normalizeDeckList } from '../_helpers';
+import { convertListToCards, getDeckCount, normalizeDeckList } from '../_helpers';
 import { BASE_URL } from '../_const';
 
 export async function GET(request: Request) {
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
   try {
     const { normalizedList, invalidLines: invalidNormalizedLines } = normalizeDeckList(body);
-    const { cards, invalidLines } = await convertListToCodes(normalizedList);
+    const { cards, invalidLines } = await convertListToCards(normalizedList);
     const existingDeck = await supabase.from('frozen decks').select('id').eq('deck_list', JSON.stringify(cards));
 
     if (existingDeck.data && existingDeck.data.length > 0) {

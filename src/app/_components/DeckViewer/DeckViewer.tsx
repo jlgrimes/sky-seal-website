@@ -7,6 +7,9 @@ interface DeckViewerProps {
   deckId: string;
 }
 
+export interface StoredCardType { code: string, count: number };
+export interface CardType { code: string, count: number, supertype: string, subtype: string };
+
 function getTargetTable(deckId: string) {
   if (deckId.length === 10) return 'decks';
   if (deckId.length === 11) return 'frozen decks';
@@ -22,6 +25,10 @@ function buildImageUrl(deckId: string) {
   }
 
   return `https://images.pokemontcg.io/${setCode}/${setNum}_hires.png`;
+}
+
+function sortCards (cardA: CardType, cardB: CardType) {
+
 }
 
 export async function DeckViewer(props: DeckViewerProps) {
@@ -42,12 +49,12 @@ export async function DeckViewer(props: DeckViewerProps) {
 
   const deck: Record<string, any> = foundDeckRes.data[0];
 
-  let cards: { code: string, count: number }[] = [];
+  let cards: CardType[] = [];
   if (deck['deck_list']) {
     cards = JSON.parse(deck['deck_list']);
   } else {
     // Else, it's a user saved deck list and we need to fetch it
-    const cardsRes = await supabase.from('cards').select('code,count').eq('deck_id', deck['id']);
+    const cardsRes = await supabase.from('cards').select('code,count,supertype,subtype').eq('deck_id', deck['id']);
     cards = cardsRes.data ?? [];
   }
 

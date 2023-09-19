@@ -1,3 +1,6 @@
+import { PokemonTCG } from "pokemon-tcg-sdk-typescript";
+import { CardType, StoredCardType } from "../_components/DeckViewer/DeckViewer";
+
 const sampleList = `
 Pokémon: 9
 2 Frigibax PAL 57
@@ -95,7 +98,38 @@ const validLimitlessEnergy = /^(\d+(?:\+\d)*) [a-zA-Z{}\-\é' ]* Energy (\d+(?:\
 const validPromoRegex = /^\d+(\+\d)* [a-zA-Z ]* PR-[a-zA-Z]{2} \d+(\+\d)*$/gi;
 const validNormalEnergyRegex = /^\d+(\+\d)* [a-zA-Z ]* (Energy)$/gi;
 
-export const convertListToCodes = async (list: string) => {
+const fetchCardData = async (cards: StoredCardType[]) => {
+  const query = cards.reduce((acc, curr) => {
+    const [set, number] = curr.code.split('-');
+    const queryStr = `(set.id:${set} number:${number})`;
+
+    if (acc.length === 0) return queryStr;
+
+    return `${acc} OR ${queryStr}`;
+  }, '');
+
+  const cardData = await PokemonTCG.findCardsByQueries({ q: query });
+
+  return cards.map((storedCard) => {
+    const storedCardData = cardData.find((data) => data.id === storedCard.code);
+
+    if (!storedCardData) {
+      throw {
+        error: 'retrieving-stored-card-data',
+        message: 'Error retrieving stored card data',
+        details: 'Could not retrieve data for ' + storedCard.code
+      }
+    }
+
+    return {
+      ...storedCard,
+      supertype: storedCardData.supertype,
+      subtype: JSON.stringify(storedCardData.subtypes)
+    }
+  })
+}
+
+export const convertListToCards = async (list: string) => {
   const sets = await fetch('https://api.pokemontcg.io/v2/sets').then((res) => res.json());
   const setData: Record<string, any>[] | null = sets['data'];
 
@@ -153,10 +187,11 @@ export const convertListToCodes = async (list: string) => {
 
     invalidLines.push(line)
   }
-  console.log(cards, invalidLines)
+
+  const loadedCardData = await fetchCardData(cards);
 
   return {
-    cards,
+    cards: loadedCardData,
     invalidLines
   }
 }
