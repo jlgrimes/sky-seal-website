@@ -125,7 +125,8 @@ const fetchCardData = async (cards: StoredCardType[]) => {
       ...storedCard,
       supertype: storedCardData.supertype,
       subtype: JSON.stringify(storedCardData.subtypes),
-      rarity: storedCardData.rarity
+      rarity: storedCardData.rarity,
+      imageUrl: storedCardData.images.large
     }
   })
 }
