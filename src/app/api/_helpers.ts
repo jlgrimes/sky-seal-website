@@ -86,14 +86,23 @@ export const normalizeDeckList = (list: string) => {
   };
 }
 
-const PTCGO_CODE_MAP_SV = {
-  sv1: 'SVI',
-  sv2: 'PAL',
-  sv3: 'OBF',
-  sve: 'SVE'
+const PTCGO_CODE_MAP_SV: Record<string, string> = {
+  svi: 'sv1',
+  pal: 'sv2',
+  obf: 'sv3',
+  sve: 'sve'
 };
 
-const validCardRegexGroups = /^(\d+(?:\+\d)*) ([a-zA-Z{}\-\é' ]*) ([a-zA-Z]{3}|[a-zA-Z]{3}-[a-zA-Z]{2}) (\d+(?:\+\d)*)$/;
+const PTCGO_CODE_MAP_PROMO: Record<string, string> = {
+  'pr-sw': 'swshp',
+  'pr-sm': 'smp',
+  'pr-xy': 'xyp',
+  'pr-sv': 'svp',
+};
+
+const getPromoSetNumberPrefix = (ptcgoCode: string) => PTCGO_CODE_MAP_PROMO[ptcgoCode.toLowerCase()]?.slice(0, -1);
+
+const validCardRegexGroups = /^(\d+(?:\+\d)*) ([a-zA-Z{}\-\é' ]*) ([a-zA-Z]{3}|(?:[a-zA-Z]{3}-[a-zA-Z]{2})|(?:PR-[a-zA-Z]{2})) (\d+(?:\+\d)*)$/;
 const validLimitlessEnergy = /^(\d+(?:\+\d)*) [a-zA-Z{}\-\é' ]* Energy (\d+(?:\+\d)*)$/;
 const validPromoRegex = /^\d+(\+\d)* [a-zA-Z ]* PR-[a-zA-Z]{2} \d+(\+\d)*$/gi;
 const validNormalEnergyRegex = /^\d+(\+\d)* [a-zA-Z ]* (Energy)$/gi;
@@ -187,12 +196,12 @@ export const convertListToCards = async (list: string) => {
   for (const line of lines) {
     const validCardMatches = validCardRegexGroups.exec(line);
     if (validCardMatches) {
-      const [_, count, name, ptcgoCode, setNum] = validCardMatches;
+      let [_, count, name, ptcgoCode, setNum] = validCardMatches;
 
       let setId = undefined;
       setId = setData.find((set) => set['ptcgoCode'] && set['id'] !== 'cel25c' && !set['name'].toLowerCase().includes('gallery') && set['ptcgoCode'].toLowerCase() === ptcgoCode.toLowerCase())?.['id'];
 
-      if (!setId) setId = Object.entries(PTCGO_CODE_MAP_SV).find(([_, svPtcgoCode]) => svPtcgoCode.toLowerCase() === ptcgoCode.toLowerCase())?.[0];
+      if (!setId) setId = PTCGO_CODE_MAP_SV[ptcgoCode.toLowerCase()];
       if (!setId) {
         // If it's a gallery subset card
         if (/^.*-[a-zA-Z][gG]$/.exec(ptcgoCode)) {
@@ -204,6 +213,11 @@ export const convertListToCards = async (list: string) => {
         error: 'unknown-set',
         message: `Unknown set for card ${name}`,
         details: `${ptcgoCode} is not a valid set for entered line "${line}".`
+      }
+
+      // Append to set number if promo
+      if (ptcgoCode.startsWith('PR-')) {
+        setNum = getPromoSetNumberPrefix(ptcgoCode).toUpperCase() + setNum;
       }
 
       cards.push({
