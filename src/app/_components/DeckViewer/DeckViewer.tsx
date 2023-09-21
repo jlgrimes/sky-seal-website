@@ -9,7 +9,7 @@ interface DeckViewerProps {
 }
 
 export interface StoredCardType { code: string, count: number };
-export interface CardType { code: string, count: number, supertype: string, subtype: string, rarity: string };
+export interface CardType { code: string, count: number, supertype: string, subtype: string, rarity: string, imageUrl?: string };
 
 function getTargetTable(deckId: string) {
   if (deckId.length === 10) return 'decks';
@@ -20,10 +20,6 @@ function getTargetTable(deckId: string) {
 
 function buildImageUrl(deckId: string) {
   const [setCode, setNum] = deckId.split('-');
-
-  if (setCode.toLowerCase() === 'swshp') {
-    return `https://images.pokemontcg.io/${setCode}/SWSH${setNum}_hires.png`;
-  }
 
   return `https://images.pokemontcg.io/${setCode}/${setNum}_hires.png`;
 }
@@ -66,7 +62,7 @@ export async function DeckViewer(props: DeckViewerProps) {
         {cards.sort(sortCards).map((card) => (
           <div key={card.code} className={styles['card-view-container']}>
             <Image
-              src={buildImageUrl(card.code)}
+              src={card.imageUrl ?? buildImageUrl(card.code)}
               alt={card.code}
               fill={true}
               objectFit='contain'
