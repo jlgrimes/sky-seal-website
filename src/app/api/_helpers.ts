@@ -90,7 +90,8 @@ const PTCGO_CODE_MAP_SV: Record<string, string> = {
   svi: 'sv1',
   pal: 'sv2',
   obf: 'sv3',
-  sve: 'sve'
+  sve: 'sve',
+  mew: 'sv3-5'
 };
 
 const PTCGO_CODE_MAP_PROMO: Record<string, string> = {
